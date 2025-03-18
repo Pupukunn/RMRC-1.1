@@ -1,4 +1,4 @@
-# iRAP-Minirescue-GUI Example 
+# RMRC 1.2
 
 ## Installation
 
