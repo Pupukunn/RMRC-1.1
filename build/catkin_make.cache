@@ -1,0 +1,2 @@
+Devices
+-DCATKIN_DEVEL_PREFIX=/home/pupukun/Downloads/RMRC-1.1-1.1/devel -DCMAKE_INSTALL_PREFIX=/home/pupukun/Downloads/RMRC-1.1-1.1/install -G Unix Makefiles

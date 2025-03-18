@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>Devices</name>
+  <version>0.0.1</version>
+  <description>A package for device control in RMRC</description>
+  <maintainer email="your@email.com">Your Name</maintainer>
+  <license>MIT</license>
+  <buildtool_depend>catkin</buildtool_depend>
+  <depend>rospy</depend>
+  <depend>sensor_msgs</depend>
+</package>
