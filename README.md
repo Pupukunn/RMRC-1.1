@@ -17,12 +17,12 @@
     ```
 3. Clone the repository:
     ```bash
-    git clone https://github.com/NonStopBle/iRAP-Minirescue-GUI.git
+    git clone https://github.com/Pupukunn/RMRC-1.1.git
     ```
 
 4. Change directory to the project folder:
     ```bash
-    cd iRAP-Minirescue-GUI/
+    cd RMRC-1.1-1.1/
     ```
 5. Open the project in Visual Studio Code in current directory:
     ```bash
