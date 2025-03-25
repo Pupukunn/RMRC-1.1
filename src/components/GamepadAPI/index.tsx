@@ -1,95 +1,83 @@
 import React, { Component } from "react";
 import ROSLIB from "roslib";
 
-interface GamepadComponentProps {
-  ros: ROSLIB.Ros
-  joypadTopicName: string
-  joyEnable: boolean
+interface KeyboardComponentProps {
+  ros: ROSLIB.Ros;
+  joypadTopicName: string;
+  joyEnable: boolean;
   onAxesChange?: (axes: number[]) => void;
-  onButtonsChange?: (buttons: GamepadButton[]) => void;
-  onJoyStickConnection?: (connection: boolean) => void;
+  onButtonsChange?: (buttons: number[]) => void; // เปลี่ยนเป็น number[] แทน GamepadButton
+  onKeyboardConnection?: (connection: boolean) => void;
 }
 
-interface GamepadComponentState {
-  gamepad: Gamepad | null | any;
-  joypadRosTopic: ROSLIB.Topic<ROSLIB.Message>
-  sensorJoyTopic: ROSLIB.Topic<ROSLIB.Message>
+interface KeyboardComponentState {
+  pressedKeys: Set<string>;
+  joypadRosTopic: ROSLIB.Topic<ROSLIB.Message>;
+  sensorJoyTopic: ROSLIB.Topic<ROSLIB.Message>;
   robotSpeedLeft: number;
   robotSpeedRight: number;
   robotSpeedFlipper: number;
-  boostMode : boolean;
-  onetimeTicker : boolean;
+  boostMode: boolean;
+  onetimeTicker: boolean;
 }
 
-
-class GamepadComponent extends Component<GamepadComponentProps, GamepadComponentState> {
-  constructor(props: GamepadComponentProps) {
+class KeyboardComponent extends Component<KeyboardComponentProps, KeyboardComponentState> {
+  constructor(props: KeyboardComponentProps) {
     super(props);
     this.state = {
-      gamepad: null,
+      pressedKeys: new Set(),
       joypadRosTopic: new ROSLIB.Topic({
         ros: this.props.ros,
-        name: this.props.joypadTopicName, // Adjust the topic name based on your setup, e.g., '/your_joy_topic'
-        messageType: 'std_msgs/Float32MultiArray', // Adjust the message type based on your setup
+        name: this.props.joypadTopicName,
+        messageType: "std_msgs/Float32MultiArray",
       }),
       sensorJoyTopic: new ROSLIB.Topic({
         ros: this.props.ros,
-        name: '/gui/output/joy', // Adjust the topic name based on your setup, e.g., '/your_joy_topic'
-        messageType: 'sensor_msgs/Joy', // Adjust the message type based on your setup
+        name: "/gui/output/joy",
+        messageType: "sensor_msgs/Joy",
       }),
       robotSpeedLeft: 0,
       robotSpeedRight: 0,
       robotSpeedFlipper: 0,
-      boostMode : false,
-      onetimeTicker : false,
+      boostMode: false,
+      onetimeTicker: false,
     };
   }
 
-
-
   componentDidMount() {
-    console.log("gameapi" , this.props.ros)
-    window.addEventListener("gamepadconnected", this.handleGamepadConnection);
-    window.addEventListener("gamepaddisconnected", this.handleGamepadDisconnection);
+    console.log("ROS connection:", this.props.ros);
+    // เพิ่ม event listener สำหรับคีย์บอร์ด
+    window.addEventListener("keydown", this.handleKeyDown);
+    window.addEventListener("keyup", this.handleKeyUp);
 
-    // Start the game loop to continuously update gamepad state
+    // เริ่ม loop เพื่ออัปเดตสถานะ
     this.gameLoop();
   }
 
   componentWillUnmount() {
-    window.removeEventListener("gamepadconnected", this.handleGamepadConnection);
-    window.removeEventListener("gamepaddisconnected", this.handleGamepadDisconnection);
+    // ลบ event listener เมื่อ component ถูกทำลาย
+    window.removeEventListener("keydown", this.handleKeyDown);
+    window.removeEventListener("keyup", this.handleKeyUp);
   }
 
-  handleGamepadConnection = (event: any) => {
-    this.setState({ gamepad: event.gamepad });
+  handleKeyDown = (event: KeyboardEvent) => {
+    const { pressedKeys } = this.state;
+    pressedKeys.add(event.key.toLowerCase());
+    this.setState({ pressedKeys });
 
-    if (event.gamepad && event.gamepad.vibrationActuator) {
-      event.gamepad.vibrationActuator.playEffect("dual-rumble", {
-        startDelay: 0,
-        duration: 1000,
-        weakMagnitude: 1.0,
-        strongMagnitude: 1.0
-      });
+    if (this.props.onKeyboardConnection && pressedKeys.size === 1) {
+      this.props.onKeyboardConnection(true); // แจ้งว่าเริ่มใช้งานคีย์บอร์ด
     }
-
-    if (this.props.onJoyStickConnection) {
-      this.props.onJoyStickConnection(true);
-    }
-
-    console.log("Gamepad connected:", event.gamepad);
   };
 
-  handleGamepadDisconnection = (event: GamepadEvent) => {
-    this.setState({ gamepad: null });
+  handleKeyUp = (event: KeyboardEvent) => {
+    const { pressedKeys } = this.state;
+    pressedKeys.delete(event.key.toLowerCase());
+    this.setState({ pressedKeys });
 
-
-    if (this.props.onJoyStickConnection) {
-      this.props.onJoyStickConnection(false);
+    if (this.props.onKeyboardConnection && pressedKeys.size === 0) {
+      this.props.onKeyboardConnection(false); // แจ้งว่าหยุดใช้งานคีย์บอร์ด
     }
-
-
-    console.log("Gamepad disconnected:", event.gamepad);
   };
 
   publishFloat32MultiArray = (data: number[]) => {
@@ -100,140 +88,88 @@ class GamepadComponent extends Component<GamepadComponentProps, GamepadComponent
       },
       data: data,
     });
-    
-
     this.state.joypadRosTopic.publish(float32MultiArrayMessage);
   };
 
-  publishJoyMessage = (axes: number[] , buttons :  GamepadButton[]) => {
-    const pressedButtons = buttons.map(button => (button.pressed ? 1 : 0));
+  publishJoyMessage = (axes: number[], buttons: number[]) => {
     const joyMessage = new ROSLIB.Message({
       header: {
         stamp: { sec: 0, nsec: 0 },
-        frame_id: '',
+        frame_id: "",
       },
-      axes: axes, // Assuming robotSpeedRight, robotSpeedLeft, robotSpeedFlipper
-      buttons: pressedButtons, // You can add button data if needed
+      axes: axes,
+      buttons: buttons,
     });
-  
-    this.state.sensorJoyTopic.publish(joyMessage)
+    this.state.sensorJoyTopic.publish(joyMessage);
   };
 
-  updateGamepadState = () => {
+  updateKeyboardState = () => {
+    const { pressedKeys } = this.state;
 
-    const { gamepad } = this.state;
-    if (gamepad) {
-      if (this.props.onAxesChange) {
-        this.props.onAxesChange([...gamepad.axes]);
-        console.log(gamepad.axes)
-      }
+    // กำหนดการควบคุมด้วยคีย์บอร์ด (คล้ายโค้ด Python)
+    let robotSpeedLeft = this.state.robotSpeedLeft;
+    let robotSpeedRight = this.state.robotSpeedRight;
+    let robotSpeedFlipper = this.state.robotSpeedFlipper;
 
-      if (this.props.onButtonsChange) {
-        this.props.onButtonsChange([...gamepad.buttons]);
-      }
+    if (pressedKeys.has("w")) {
+      robotSpeedLeft += 1;
+      robotSpeedRight += 1;
+    }
+    if (pressedKeys.has("s")) {
+      robotSpeedLeft -= 1;
+      robotSpeedRight -= 1;
+    }
+    if (pressedKeys.has("a")) {
+      robotSpeedLeft -= 1;
+      robotSpeedRight += 1;
+    }
+    if (pressedKeys.has("d")) {
+      robotSpeedLeft += 1;
+      robotSpeedRight -= 1;
+    }
 
-      if (gamepad.buttons[4].pressed == 0 && gamepad.buttons[6].pressed == 0) {
-        this.setState({ robotSpeedLeft: 0 })
-      }
-      else if (gamepad.buttons[4].pressed == 1) {
-        this.setState({ robotSpeedLeft: this.state.boostMode ? 147 : 294 })
-      }
-      else if (gamepad.buttons[6].pressed == 1) {
-        this.setState({ robotSpeedLeft: -(this.state.boostMode ? 147 : 294) })
-      }
+    // จำลอง axes และ buttons สำหรับ sensor_msgs/Joy
+    const axes = [
+      pressedKeys.has("a") ? -1 : pressedKeys.has("d") ? 1 : 0, // แกนซ้าย-ขวา
+      pressedKeys.has("w") ? 1 : pressedKeys.has("s") ? -1 : 0, // แกนหน้า-หลัง
+      0, // placeholder
+    ];
+    const buttons = [
+      pressedKeys.has("q") ? 1 : 0,
+      pressedKeys.has("e") ? 1 : 0,
+      pressedKeys.has("r") ? 1 : 0,
+      pressedKeys.has("t") ? 1 : 0,
+    ];
 
+    this.setState({
+      robotSpeedLeft,
+      robotSpeedRight,
+      robotSpeedFlipper,
+    });
 
-      if (gamepad.buttons[5].pressed == 0 && gamepad.buttons[7].pressed == 0) {
-        this.setState({ robotSpeedRight: 0 })
-      }
-      else if (gamepad.buttons[5].pressed == 1) {
-        this.setState({ robotSpeedRight: (this.state.boostMode ? 147 : 294) })
-      }
-      else if (gamepad.buttons[7].pressed == 1) {
-        this.setState({ robotSpeedRight: - (this.state.boostMode ? 147 : 294) })
-      }
-
-      if (gamepad.buttons[3].pressed == 0 && gamepad.buttons[0].pressed == 0) {
-        this.setState({ robotSpeedFlipper: 0 })
-      }
-      else if (gamepad.buttons[3].pressed == 1) {
-        this.setState({ robotSpeedFlipper: 16999 })
-      }
-      else if (gamepad.buttons[0].pressed == 1) {
-        this.setState({ robotSpeedFlipper: -16999 })
-      }
-
-      if(gamepad.buttons[2].pressed){
-          if(this.state.onetimeTicker == false){
-            this.setState({boostMode : !this.state.boostMode})
-            this.setState({onetimeTicker : true})
-          }
-      }
-      else{
-        this.setState({onetimeTicker : false})
-      }
-      
-      //(360/140)
-
-
-
-      // console.log("flipper : " , this.state.robotSpeedFlipper)
-
-      // console.log("L :", this.state.robotSpeedLeft)
-      // console.log("R : ", this.state.robotSpeedRight)
-
-      // console.log("L1 : ", gamepad.buttons[4].pressed)
-      // console.log("L2 : ", gamepad.buttons[6].pressed)
-
-      // console.log("R1 : ", gamepad.buttons[5].pressed)
-      // console.log("R2 : ", gamepad.buttons[7].pressed)
-
-      // console.log("R1 : ", gamepad.buttons[5].pressed)
-      // console.log("R2 : ", gamepad.buttons[7].pressed)
-
-
-      // console.log("Triangle : ", gamepad.buttons[3].pressed)
-      // console.log("Rectangle : ", gamepad.buttons[2].pressed)
-      // console.log("X : ", gamepad.buttons[0].pressed)
-      // console.log("() : ", gamepad.buttons[1].pressed)
-
-
-
-      // publishFloat32MultiArray()
-
-      // Publish the message to the ROS topic
-      if (this.props.joyEnable) {
-        let publishFloat = [this.state.robotSpeedRight, this.state.robotSpeedLeft, this.state.robotSpeedFlipper]
-        this.publishJoyMessage(gamepad.axes , gamepad.buttons)
-        this.publishFloat32MultiArray(publishFloat);
-      }
-      else{
-        this.publishFloat32MultiArray([0,0,0]);
-      }
-
+    if (this.props.joyEnable) {
+      const publishFloat = [robotSpeedRight, robotSpeedLeft, robotSpeedFlipper];
+      this.publishJoyMessage(axes, buttons);
+      this.publishFloat32MultiArray(publishFloat);
+    } else {
+      this.publishFloat32MultiArray([0, 0, 0]);
     }
   };
 
   gameLoop = () => {
-
-    const gamepads = navigator.getGamepads();
-    if (gamepads[0]) {
-      this.setState({ gamepad: gamepads[0] });
-      this.updateGamepadState();
-    }
-
+    this.updateKeyboardState();
     requestAnimationFrame(this.gameLoop);
   };
 
   render() {
-    const { gamepad } = this.state;
+    const { pressedKeys } = this.state;
 
     return (
       <div>
-
+        {/* //<p>Pressed Keys: {Array.from(pressedKeys).join(", ")}</p> */}
       </div>
     );
   }
 }
 
-export default GamepadComponent;
+export default KeyboardComponent;
