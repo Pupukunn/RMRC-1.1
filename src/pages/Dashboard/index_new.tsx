@@ -40,8 +40,8 @@ interface IState {
   readRobotSpeedRight: number
   readRobotPitchAngle: number
   previousUpdate: number;
-  servo1Angle: number;
-  servo2Angle: number;
+  servo_left_angle: number;
+  servo_right_angle: number;
   motorL: number;
   motorR: number;
   arm1_position: number;
@@ -49,6 +49,7 @@ interface IState {
   arm3_position: number;
   arm4_position: number;
   arm5_position: number;
+  wifiSignal: number;
 }
 
 class App extends Component<IProps, IState> {
@@ -70,15 +71,16 @@ class App extends Component<IProps, IState> {
       readRobotSpeedLeft: 0,
       readRobotPitchAngle: 0,
       previousUpdate: 0,
-      servo1Angle: 90,
-      servo2Angle: 90,
+      servo_right_angle: 135,
+      servo_left_angle: 135,
       motorL: 0,
       motorR: 0,
       arm1_position: 90,
       arm2_position: 90,
       arm3_position: 90,
       arm4_position: 90,
-      arm5_position: 90
+      arm5_position: 90,
+      wifiSignal: 0,
     }
   }
 
@@ -113,7 +115,7 @@ class App extends Component<IProps, IState> {
     servoTopic.subscribe((message: ROSLIB.Message) => {
       const servoMessage = message as ROSLIB.Message & { data: number };
       console.log("Received servo1_angle:", servoMessage.data); // Debug
-      this.setState({ servo1Angle: servoMessage.data });
+      this.setState({ servo_left_angle: servoMessage.data });
     });
   }
 
@@ -127,7 +129,7 @@ class App extends Component<IProps, IState> {
     servoTopic.subscribe((message: ROSLIB.Message) => {
       const servoMessage = message as ROSLIB.Message & { data: number };
       console.log("Received servo2_angle:", servoMessage.data); // Debug
-      this.setState({ servo2Angle: servoMessage.data });
+      this.setState({ servo_right_angle: servoMessage.data });
     });
   }
 
@@ -229,6 +231,20 @@ class App extends Component<IProps, IState> {
     });
   }
 
+  subscribeWifiSignal(ros: ROSLIB.Ros, Hotspot_burritos: string) {
+    const wifiTopic = new ROSLIB.Topic({
+      ros: ros,
+      name: Hotspot_burritos, // '/wifi_signal'
+      messageType: 'std_msgs/Float32', // ประเภทข้อความที่ใช้ใน ROS
+    });
+
+    wifiTopic.subscribe((message: ROSLIB.Message) => {
+      const wifiMessage = message as ROSLIB.Message & { data: number };
+      console.log("Received WiFi Signal:", wifiMessage.data); // Debug
+      this.setState({ wifiSignal: wifiMessage.data });
+    });
+  }
+
 
   subscribeRobot(ros: ROSLIB.Ros, topicName: string) {
     const { cameraA } = this.state;
@@ -284,6 +300,7 @@ class App extends Component<IProps, IState> {
       this.subscribeArm3(ros, '/arm3'); // เพิ่มการสมัครสมาชิก
       this.subscribeArm4(ros, '/arm4');
       this.subscribeArm5(ros, '/arm5'); // เพิ่มการสมัครสมาชิก
+      this.subscribeWifiSignal(ros, '/wifi_signal');
       this.setState({ robotConnection: true })
     })
 
@@ -313,26 +330,16 @@ class App extends Component<IProps, IState> {
   };
 
   render() {
-    const { servo1Angle } = this.state;
-    const { servo2Angle } = this.state;
-    const { motorL } = this.state;
-    const { motorR } = this.state;
-    const { arm1_position } = this.state;
-    const { arm2_position } = this.state;
-    const { arm3_position } = this.state;
-    const { arm4_position } = this.state;
-    const { arm5_position } = this.state;
+    const { servo_left_angle, servo_right_angle, motorL, motorR, arm1_position, arm2_position, arm3_position, arm4_position, arm5_position , wifiSignal} = this.state;
 
-    
     return (
 
       <div className="all">
-        <div className="overlay">
         <GamepadComponent ros={this.state.ros} joypadTopicName={'/gui/output/robot_control'} onKeyboardConnection={(connection) => {
           this.setState({ onKeyboardConnection: connection });
         }} joyEnable={this.state.startButton} />
         <nav>
-          <div className="Name">RMRC</div>
+          <div className="Name">RMRC</div>  
           <div className="logo">
             <img src={logoImage}></img>
           </div>
@@ -342,7 +349,7 @@ class App extends Component<IProps, IState> {
             {/* <img src="http://localhost:8000/video_feed" alt="Camera Stream" /> */}
             <ImageViewer ros={this.state.ros} ImageCompressedTopic={'/usb_cam/image_raw/compressed'} height={'100%'} width={'100%'} rotate={180} hidden={false}></ImageViewer>
             <div className="textcam">CAM 1</div>
-            <button  className="zoom"></button>
+            <button className="zoom"></button>
           </div>
           <div className="Cam2 glass">
             <ImageViewer ros={this.state.ros} ImageCompressedTopic={'/usb_cam1/image_raw/compressed'} height={'100%'} width={'100%'} rotate={180} hidden={false}></ImageViewer>
@@ -351,23 +358,23 @@ class App extends Component<IProps, IState> {
           <div className="CamAI glass">
             <ImageViewer ros={this.state.ros} ImageCompressedTopic={'/detect_marker/image_raw/compressed'} height={'100%'} width={'100%'} rotate={180} hidden={!this.state.detection} ></ImageViewer>
             <div className="detectbutton">
-            <Button variant="primary" onClick={() => {
-              this.setState({ detection: !this.state.detection })
-            }}>
-              {this.state.detection ? "Detection Off" : "Detection On"}
-            </Button>
-          </div>
+              <Button variant="primary" onClick={() => {
+                this.setState({ detection: !this.state.detection })
+              }}>
+                {this.state.detection ? "Detection Off" : "Detection On"}
+              </Button>
+            </div>
             <div className="textcam">CAM AI</div>
           </div>
           <div className="StatusBar">
             <div className="speedstatus glass">
-              <div className="leftrpm">Speed L : {motorL} rpm</div>
-              <div className="rightrpm">Speed R : {motorR} rpm</div>
+              <div className="leftrpm">Speed L : {motorL} </div>
+              <div className="rightrpm">Speed R : {motorR} </div>
             </div>
 
             <div className="flipperstatus glass">
-              <div className="leftflipper">Flipper L : {servo1Angle}°</div>
-              <div className="rightflipper">Flipper R : {servo2Angle}°</div>
+              <div className="leftflipper">Flipper L : {servo_left_angle}°</div>
+              <div className="rightflipper">Flipper R : {servo_right_angle}°</div>
             </div>
             <div className="Joystatus glass">
               <img src={keyboard}></img>
@@ -377,7 +384,10 @@ class App extends Component<IProps, IState> {
                 </div>
               </div>
             </div>
-            <div className="joybutton">
+            <div className="wifisignal glass">
+                 WiFi Signal: {wifiSignal} dBm {wifiSignal > -50 ? "(Good)" : wifiSignal > -70 ? "(Fair)" : "(Weak)"}
+            </div>
+            {/* <div className="joybutton">
               {
                 !this.state.startButton ? <Button variant="primary" onClick={() => {
                   this.setState({ startButton: !this.state.startButton })
@@ -389,24 +399,24 @@ class App extends Component<IProps, IState> {
                   {!this.state.startButton ? "Start" : "Stop"}
                 </Button>
               }
-            </div>
+            </div> */}
             <div className="Arm glass">
               <div className="servoarm">Servo1 : {arm1_position}°</div>
+             
               <div className="servoarm">Servo2 : {arm2_position}°</div>
               <div className="servoarm">Servo3 : {arm3_position}°</div>
               <div className="servoarm">Servo4 : {arm4_position}°</div>
               <div className="servoarm">Servo5 : {arm5_position}°</div>
+              
             </div>
             <div className="IMAGE">
             </div>
-         
-          </div>
-          
-       
           </div>
         </div>
       </div>
-
+    //   <div className="wifiSignal">
+    //   WiFi Signal: {wifiSignal} dBm {wifiSignal > -50 ? "(Good)" : wifiSignal > -70 ? "(Fair)" : "(Weak)"}
+    // </div>
 
     );
   }

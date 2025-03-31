@@ -2,15 +2,12 @@
 
   color: white;
   font-family: "Source Serif 4", serif;
-  overflow-x: hidden;
-  /* Hide horizontal scrollbar */
-  overflow-y: auto;
-  /* Add vertical scrollbar */
+
 }
 
-body {
-  width: 100vw;
-  height: 100vh;
+้html, body {
+
+  height: 100%;
   margin: 0;
   padding: 0;
   box-sizing: border-box;
@@ -22,26 +19,22 @@ body {
   font-weight: 400;
   font-style: normal;
 }
-.overlays{
-  width: 100vw;
-  height: 100vh; /* ครอบคลุมทั้งหน้าจอ */
 
-  background-color: rgba(0, 0, 0, 0.8);
-  z-index: 2;
-}
-.all{
+body {
+  position: relative; /* หรือ fixed */
   background-image: url(/src/pages/Dashboard/image/a6ac9244c02998a5dcce22c324d8d8a4.gif);
   width: 100vw;
-  height: 1080px; /* ครอบคลุมทั้งหน้าจอ */
+  height: 100vh;
   background-repeat: no-repeat;
-  background-position: center; /* หรือ 50% 50% */
+  background-position: center;
   background-size: cover;
-  top: 0;
-  left: 0;
+  background-attachment: fixed;
   margin: 0;
   padding: 0;
-  z-index: -1; /* ให้พื้นหลังอยู่ด้านหลัง content อื่น */
+  z-index: -1;
 }
+
+
 
 nav {
   display: flex;
@@ -63,6 +56,7 @@ nav {
   color: white;
   left: 0px;
   justify-content: center;
+  padding-bottom: 1vh;
   font-size: 4rem;
   text-shadow: 3px 3px 3px rgba(red, green, blue, 0.5) ;
 }
@@ -74,7 +68,7 @@ nav {
   position: relative;
   right: 0;
   padding-right: 3vw;
-  padding-top: 7px;
+  padding-top: 4px;
 }
 
 .container {
@@ -100,11 +94,12 @@ nav {
   position: relative;
   margin: 1rem 0px 0px 2vw;
   width: 46vw;
-  height: 400px;
+  height: 38vh;
 }
 .Cam1 img {
   border-radius: 36px;
   width: 100%;
+  height: 100%;
   object-fit: cover;
   display: flex;
   margin: auto;
@@ -114,12 +109,13 @@ nav {
   position: relative;
   margin: 1rem 2vw 0px 0vw;
   width: 46vw;
-  height: 400px;
+  height: 38vh;
 }
 
 .Cam2 img {
   border-radius: 36px;
   width: 100%;
+  height: 100%;
   object-fit: cover;
   display: flex;
   margin: auto;
@@ -129,12 +125,13 @@ nav {
   position: relative;
   margin: 0px 0px 0px 2vw;
   width: 46vw;
-  height: 400px;
+  height: 38vh;
 }
 
 .CamAI img {
   border-radius: 36px;
   width: 46vw;
+  height: 100%;
   object-fit: cover;
   display: flex;
   margin: auto;
@@ -151,72 +148,75 @@ nav {
 .detectbutton button {
 
   width: 27vw;
-  height: 60px;
-  margin: 25px 0px 25px 9.5vw;
-  background-color: transparent;
-  backdrop-filter: blur(20px);
-  border-radius: 12px;
-  border: 2px solid white;
+  height: 6vh;
+  margin: 2.3vh 0px 2.3vh 9.5vw;
   color: white;
   font-family: "Source Serif 4", serif; 
   font-size: 32px;
   cursor: pointer;
+  background-color: transparent;
+  backdrop-filter: blur(20px);
+  border: 2px solid white;
+  background-image: linear-gradient(120deg,
+      rgba(255, 255, 255, 0.1),
+      rgba(0, 0, 0, 0.2));
+  border-radius: 12px;
 }
 
 .StatusBar {
   position: relative;
-  margin: 0px 1vw 20px 0px;
+  margin: 0px 2vw 2vh 0px;
 
 }
 
 .speedstatus {
-  width: 27vw;
-  height: 110px;
+  width: 25vw;
+  height: 10.2vh;
   display: flex;
   justify-content: center;
   align-items: center;
   font-size: 1.7vw;
   border-radius: 1rem;
-  margin-bottom: 20px;
+  margin-bottom: 3vh;
   gap: 20px;
 }
 
 .flipperstatus {
-  width: 27vw;
-  height: 110px;
+  width: 25vw;
+  height: 10.2vh;
   display: flex;
   justify-content: center;
   align-items: center;
   font-size: 1.7vw;
-  border-radius: 12px;
- 
+  border-radius: 1rem;
   gap: 20px;
 }
 
 .Joystatus {
-  width: 17vw;
-  height: 170px;
+  width: 20vw;
+  height: 17vh;
   position: absolute;
   top: 0;
-  right: 20px;
+  right: 0px;
   border-radius: 12px;
   text-align: center;
 }
 
 .Joystatus img {
-  width: 95%;
-  padding-top: 10px;
-  height: 120px;
-  object-fit: cover;
+  width: 17vw;
+  padding-top: 1vh;
+  height: 12vh;
+  
 }
 
 .statustext {
-  font-size: 1.2vw;
+
+  font-size: 1.4vw;
 }
 
-.joybutton button {
-  width: 17vw;
-  height: 70px;
+/* .joybutton button {
+  width: 18vw;
+  height: 6vh;
   position: absolute;
   background-color: transparent;
   backdrop-filter: blur(20px);
@@ -225,17 +225,16 @@ nav {
   color: white;
   font-family: "Source Serif 4", serif;
   font-size: 32px;
-  top: 190px;
-  right: 20px;
+
   cursor: pointer;
-}
+} */
 
 .Arm {
   width: 21vw;
   height: 200px;
   border-radius: 12px;
   position: absolute;
-  right: 20px;
+  right: 0px;
   display: grid;
   grid-template-columns: auto auto ;
   justify-content: space-around;
@@ -262,6 +261,18 @@ nav {
   object-fit: cover;
   border: 2px solid white;
 }
+.wifisignal{
+  width: 20vw;
+  height: 4vh;
+  padding-top: 10px;
+  font-size: 1.4vw;
+  position: absolute;
+  right: 0px;
+  top: 19vh;
+  border-radius: 12px;
+  text-align: center;
+
+}
 /* .zoom{
   background-color: transparent;
   border: none;
@@ -275,14 +286,3 @@ nav {
   object-fit: cover;
   background-image: url(/src/pages/Dashboard/image/zzin.png)
 } */
-
-@keyframes zoomIn {
-  from {
-    transform: scale(0.5);
-    opacity: 0;
-  }
-  to {
-    transform: scale(1);
-    opacity: 1;
-  }
-}
