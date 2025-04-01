@@ -1,12 +1,10 @@
 #root {
-
   color: white;
   font-family: "Source Serif 4", serif;
-
 }
 
-้html, body {
-
+้html,
+body {
   height: 100%;
   margin: 0;
   padding: 0;
@@ -34,8 +32,6 @@ body {
   z-index: -1;
 }
 
-
-
 nav {
   display: flex;
   flex-wrap: wrap;
@@ -44,11 +40,14 @@ nav {
   width: 100vw;
   background-color: transparent;
   backdrop-filter: blur(20px);
-  background-image: linear-gradient(120deg,
-      rgba(255, 255, 255, 0.1),
-      rgba(0, 0, 0, 0.1));
+  background-image: linear-gradient(
+    120deg,
+    rgba(255, 255, 255, 0.1),
+    rgba(0, 0, 0, 0.1)
+  );
+  margin: 0;
+  padding: 0;
 }
-
 .Name {
   display: grid;
   place-items: center;
@@ -58,7 +57,7 @@ nav {
   justify-content: center;
   padding-bottom: 1vh;
   font-size: 4rem;
-  text-shadow: 3px 3px 3px rgba(red, green, blue, 0.5) ;
+  text-shadow: 3px 3px 3px rgba(red, green, blue, 0.5);
 }
 
 .logo img {
@@ -74,27 +73,62 @@ nav {
 .container {
   display: grid;
   grid-template-columns: auto auto;
-  column-gap: 1vw;
-  row-gap: 1.5vw;
-  width: 100vw;
+  row-gap: 1vw;
   justify-content: space-evenly;
+  margin: 1.5vh 0vw;
 }
-
 .glass {
   background-color: transparent;
   backdrop-filter: blur(15px);
   border-radius: 36px;
   border: 2px solid white;
-  background-image: linear-gradient(120deg,
-      rgba(255, 255, 255, 0.1),
-      rgba(0, 0, 0, 0.2));
+  background-image: linear-gradient(
+    120deg,
+    rgba(255, 255, 255, 0.1),
+    rgba(0, 0, 0, 0.2)
+  );
 }
 
 .Cam1 {
-  position: relative;
-  margin: 1rem 0px 0px 2vw;
+  position: absolute;
   width: 46vw;
   height: 38vh;
+  transition: all 0.3s ease;
+}
+.Cam1-container {
+  position: relative;
+  width: 46vw;
+  height: 38vh;
+}
+
+/* Placeholder เพื่อคงขนาดและตำแหน่ง */
+.Cam1-placeholder {
+  width: 46vw;
+  height: 38vh;
+  background-color: transparent; /* หรือใส่สีเพื่อ debug */
+}
+.Cam1.fullscreen,
+.Cam2.fullscreen,
+.CamAI.fullscreen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 80vh; /* ใช้ 100vh เพื่อให้เต็มจอเหมือนกัน */
+  margin: 0;
+  padding: 0;
+  z-index: 1000; /* ใช้ z-index เดียวกัน */
+  border-radius: 0;
+  transition: all 0.3s ease;
+}
+
+.Cam1.fullscreen img,
+.Cam2.fullscreen img,
+.CamAI.fullscreen img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 0; /* ลบมุมโค้งเมื่อ fullscreen */
 }
 .Cam1 img {
   border-radius: 36px;
@@ -107,9 +141,22 @@ nav {
 
 .Cam2 {
   position: relative;
-  margin: 1rem 2vw 0px 0vw;
   width: 46vw;
   height: 38vh;
+  transition: all 0.3s ease;
+}
+/* .Cam2-container {
+  position: relative;
+
+  width: 46vw;
+  height: 38vh;
+} */
+
+/* Placeholder เพื่อคงขนาดและตำแหน่ง */
+.Cam2-placeholder {
+  width: 46vw;
+  height: 38vh;
+  background-color: transparent; /* หรือใส่สีเพื่อ debug */
 }
 
 .Cam2 img {
@@ -123,9 +170,9 @@ nav {
 
 .CamAI {
   position: relative;
-  margin: 0px 0px 0px 2vw;
   width: 46vw;
   height: 38vh;
+  transition: all 0.3s ease;
 }
 
 .CamAI img {
@@ -146,58 +193,82 @@ nav {
 }
 
 .detectbutton button {
-
   width: 27vw;
   height: 6vh;
-  margin: 2.3vh 0px 2.3vh 9.5vw;
+  margin: 2vh 0px 0px 9.5vw;
   color: white;
-  font-family: "Source Serif 4", serif; 
+  font-family: "Source Serif 4", serif;
   font-size: 32px;
   cursor: pointer;
   background-color: transparent;
   backdrop-filter: blur(20px);
   border: 2px solid white;
-  background-image: linear-gradient(120deg,
-      rgba(255, 255, 255, 0.1),
-      rgba(0, 0, 0, 0.2));
+  background-image: linear-gradient(
+    120deg,
+    rgba(255, 255, 255, 0.1),
+    rgba(0, 0, 0, 0.2)
+  );
   border-radius: 12px;
+  
 }
 
 .StatusBar {
   position: relative;
-  margin: 0px 2vw 2vh 0px;
-
+  
+  z-index: 10;
 }
 
 .speedstatus {
   width: 25vw;
   height: 10.2vh;
+  position: relative;
   display: flex;
-  justify-content: center;
+  justify-content: space-evenly;
   align-items: center;
   font-size: 1.7vw;
   border-radius: 1rem;
-  margin-bottom: 3vh;
+
   gap: 20px;
 }
 
 .flipperstatus {
   width: 25vw;
   height: 10.2vh;
+  position: relative;
   display: flex;
-  justify-content: center;
+  justify-content: space-evenly;
   align-items: center;
   font-size: 1.7vw;
   border-radius: 1rem;
   gap: 20px;
 }
+.joyflex {
+  display: flex;
+  width: 20vw;
+  height: 47vh;
+  position: absolute;
+  right: 0;
+  top: 0;
+  flex-direction: column;
+  justify-content: space-evenly;
 
+  gap: 2vh;
+}
+.statusflex {
+  display: flex;
+  width: 25vw;
+  height: 47vh;
+  position: absolute;
+  flex-direction: column;
+  justify-content: space-evenly;
+  gap: 2vh;
+
+}
 .Joystatus {
   width: 20vw;
   height: 17vh;
-  position: absolute;
-  top: 0;
-  right: 0px;
+  position: relative;
+  right: 0;
   border-radius: 12px;
   text-align: center;
 }
@@ -206,54 +277,46 @@ nav {
   width: 17vw;
   padding-top: 1vh;
   height: 12vh;
-  
+}
+.wifisignal {
+  display: flex;
+  justify-content: center;
+  gap: 2vh;
+  position: relative;
+  width: 20vw;
+  height: 4vh;
+  padding-top: 0.4vh;
+  font-size: 1.4vw;
+  border-radius: 1rem;
+  text-align: center;
 }
 
 .statustext {
-
   font-size: 1.4vw;
 }
 
-/* .joybutton button {
-  width: 18vw;
-  height: 6vh;
-  position: absolute;
-  background-color: transparent;
-  backdrop-filter: blur(20px);
-  border-radius: 12px;
-  border: 2px solid white;
-  color: white;
-  font-family: "Source Serif 4", serif;
-  font-size: 32px;
-
-  cursor: pointer;
-} */
-
 .Arm {
-  width: 21vw;
+  width: 20vw;
   height: 200px;
   border-radius: 12px;
-  position: absolute;
+  position: relative;
   right: 0px;
   display: grid;
-  grid-template-columns: auto auto ;
+  grid-template-columns: auto auto;
   justify-content: space-around;
   align-items: center;
   row-gap: 1vw;
-  margin-top: 30px;
 
 }
 
-.servoarm{
-
+.servoarm {
   font-size: 1.7vw;
   gap: 20px;
-
 }
 
-.IMAGE{
-  margin-top: 30px;
-  width: 23vw;
+.IMAGE {
+  position: relative;
+  width: 25vw;
   height: 200px;
   border-radius: 12px;
   background-image: url(/src/pages/Dashboard/image/aaaa.jpg);
@@ -261,28 +324,140 @@ nav {
   object-fit: cover;
   border: 2px solid white;
 }
-.wifisignal{
-  width: 20vw;
-  height: 4vh;
-  padding-top: 10px;
-  font-size: 1.4vw;
-  position: absolute;
-  right: 0px;
-  top: 19vh;
-  border-radius: 12px;
-  text-align: center;
 
-}
-/* .zoom{
-  background-color: transparent;
-  border: none;
-  cursor: pointer;
-  width: 40px;
-  height: 40px;
+/* สไตล์ปุ่ม zoom (เปลี่ยนชื่อเป็นปุ่ม fullscreen) */
+.zoom {
   position: absolute;
   top: 10px;
-  right: 1vw;
-  background-size: cover;
+  right: 1rem;
+  margin-right: 1rem;
+  background-color: transparent;
+  backdrop-filter: blur(20px);
+  border: 2px solid white;
+  color: white;
+  font-family: "Source Serif 4", serif;
+  font-size: 16px;
+  padding: 5px 10px;
+  border-radius: 12px;
+  cursor: pointer;
+  z-index: 10; /* ให้ปุ่มอยู่เหนือวิดีโอ */
+}
+
+.zoom:hover {
+  background-image: linear-gradient(
+    120deg,
+    rgba(255, 255, 255, 0.2),
+    rgba(0, 0, 0, 0.3)
+  );
+}
+.StatusBar.fullscreen-StatusBar {
+  display: flex;
+
+  position: fixed;
+  bottom: 0;  
+  width: 100vw;
+  height: 20vh;
+  z-index: 2000; /* สูงกว่ากล้อง */
+  pointer-events: none;
+  margin: 0;
+  padding: 0;
+  gap: 20px;
+}
+.statusflex.fullscreen-statusflex{
+  position: relative;
+  flex-direction: column;
+  width: 30vw;
+  height:auto;
+  justify-content: flex-start;
+  
+}
+.joyflex.fullscreen-joyflex{
+  position: relative;
+  flex-direction: column;
+  
+  width: 30vw;
+  height:auto;
+  justify-content: flex-start;
+  
+}
+/* speedstatus เมื่อ fullscreen */
+.speedstatus.fullscreen-speedstatus {
+  position: relative;
+  left: 2vw;
+  top: 2vh;
+  height: 7vh;
+  z-index: 2100;
+  font-size: 1.7rem;
+  pointer-events: auto;
+
+}
+
+/* flipperstatus เมื่อ fullscreen */
+.flipperstatus.fullscreen-flipperstatus {
+  position: absolute;
+  left: 2vw;
+  top: 11vh;
+  height: 7vh;
+  z-index: 2100;
+  font-size: 1.5vw;
+  pointer-events: auto;
+
+}
+
+/* wifisignal เมื่อ fullscreen */
+.wifisignal.fullscreen-wifisignal {
+  position: absolute;
+  top: 2vh;
+  left: 1vw;
+  width: 20vw;
+  height: 7vh;
+  font-size: 1.6vw;
+  align-items: center;
+  z-index: 2100;
+  text-align: center;
+  pointer-events: auto;
+  margin: 0;
+}
+
+/* Arm เมื่อ fullscreen */
+.Arm.fullscreen-Arm {
+  position: fixed;
+  bottom: 2vh; /* คงตำแหน่งจากขอบล่าง */
+  right: 2vw; /* คงตำแหน่งจากขอบขวา */
+  width: 21vw;
+  height: 15vh;
+  border-radius: 12px;
+  display: grid;
+  grid-template-columns: auto auto;
+  justify-content: space-around;
+  align-items: center;
+  row-gap: 1vw;
+  font-size: 1rem;
+  z-index: 2100;
+  pointer-events: auto;
+  margin: 0;
+}
+
+/* IMAGE เมื่อ fullscreen */
+.IMAGE.fullscreen-IMAGE {
+  position: fixed;
+  bottom: 2vh; /* คงตำแหน่งจากขอบล่าง */
+  right: 25vw; /* คงตำแหน่งจากขอบขวา */
+  width: 17vw;
+  height: 15vh;
+  z-index: 2100;
   object-fit: cover;
-  background-image: url(/src/pages/Dashboard/image/zzin.png)
-} */
+  pointer-events: auto;
+  margin: 0;
+}
+
+/* Joystatus เมื่อ fullscreen */
+.Joystatus.fullscreen-Joystatus {
+  display: none; /* คงการซ่อน */
+}
+.detectbutton.fullscreen-detectbutton{
+  position: absolute;
+  bottom: 2vh;
+  left: 19vw;
+  margin-top: 2vh;
+}
